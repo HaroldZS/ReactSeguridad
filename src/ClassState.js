@@ -48,7 +48,7 @@ class ClassState extends React.Component {
         {this.state.error && <p>Error: el código es incorrecto</p>}
         {this.state.loading && <Loading />}
         <input
-          placeholder="Código d seguridad"
+          placeholder="Código de seguridad"
           value={this.state.value}
           onChange={(event) => {
             this.setState({value: event.target.value})
