@@ -5,6 +5,16 @@ const SECURITY_CODE = "paradigma";
 function UseReducer({ name }) {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
+  const onConfirm = () => dispatch({ type: actionTypes.confirm });
+  const onError = () => dispatch({ type: actionTypes.error });
+  const onCheck = () => dispatch({ type: actionTypes.check });
+  const onDelete = () => dispatch({ type: actionTypes.delete });
+  const onReset = () => dispatch({ type: actionTypes.reset });
+
+  const onWrite = ({ target: { value } }) => {
+    dispatch({ type: actionTypes.write, payload: value });
+  };
+
   React.useEffect(() => {
     console.log("Empezando el efecto");
 
@@ -12,9 +22,9 @@ function UseReducer({ name }) {
       setTimeout(() => {
         console.log("Haciendo la validación");
         if (state.value === SECURITY_CODE) {
-          dispatch({ type: "CONFIRM" });
+          onConfirm();
         } else {
-          dispatch({ type: "ERROR" });
+          onError();
         }
         console.log("Terminando la validación");
       }, 3000);
@@ -33,50 +43,24 @@ function UseReducer({ name }) {
         <input
           placeholder="Código de seguridad"
           value={state.value}
-          onChange={(event) => {
-            dispatch({ type: "WRITE", payload: event.target.value });
-          }}
+          onChange={onWrite}
         />
-        <button
-          onClick={() => {
-            dispatch({ type: "CHECK" });
-          }}
-        >
-          Comprobar
-        </button>
+        <button onClick={onCheck}>Comprobar</button>
       </div>
     );
   } else if (state.confirmed && !state.deleted) {
     return (
       <React.Fragment>
         <p>Pedimos confirmación. ¿Estás seguro?</p>
-        <button
-          onClick={() => {
-            dispatch({ type: "DELETE" });
-          }}
-        >
-          Sí, eliminar
-        </button>
-        <button
-          onClick={() => {
-            dispatch({ type: "RESET" });
-          }}
-        >
-          No, me arrepentí
-        </button>
+        <button onClick={onDelete}>Sí, eliminar</button>
+        <button onClick={onReset}>No, me arrepentí</button>
       </React.Fragment>
     );
   } else {
     return (
       <React.Fragment>
         <p>Eliminado con éxito</p>
-        <button
-          onClick={() => {
-            dispatch({ type: "RESET" });
-          }}
-        >
-          Resetear, volver atrás
-        </button>
+        <button onClick={onReset}>Resetear, volver atrás</button>
       </React.Fragment>
     );
   }
@@ -90,32 +74,40 @@ const initialState = {
   confirmed: false,
 };
 
+const actionTypes = {
+  confirm: "CONFIRM",
+  error: "ERROR",
+  delete: "DELETE",
+  write: "WRITE",
+  reset: "RESET",
+};
+
 const reducerObject = (state, payload) => ({
-  CONFIRM: {
+  [actionTypes.confirm]: {
     ...state,
     error: false,
     loading: false,
     confirmed: true,
   },
-  ERROR: {
+  [actionTypes.error]: {
     ...state,
     error: true,
     loading: false,
   },
-  WRITE: {
+  [actionTypes.write]: {
     ...state,
     value: payload,
   },
-  CHECK: {
+  [actionTypes.check]: {
     ...state,
     error: false,
     loading: true,
   },
-  DELETE: {
+  [actionTypes.delete]: {
     ...state,
     deleted: true,
   },
-  RESET: {
+  [actionTypes.reset]: {
     ...state,
     confirmed: false,
     deleted: false,
